@@ -36,13 +36,9 @@ works only with the regular comparison operator `==`, not with the
 object identity comparison `===`, as the latter is always different
 for different types.
 
-Value symbols also define an ordering. This ordering is based on
-implementation details, not on the symbol's string representation.
-Their ordering is thus different from Julia's regular symbols.
+Value symbols also define an ordering. This ordering is based on the
+symbols' name, same as for Julia's regular symbols:
 ```Julia
 @assert :car < :plane
-@assert (ValueSymbol(:car) < ValueSymbol(:plane) ||
-         ValueSymbol(:car) > ValueSymbol(:plane))
+@assert ValueSymbol(:car) < ValueSymbol(:plane)
 ```
-`:car < :plane` is always true; for the respective value symbols,
-things can go either way.

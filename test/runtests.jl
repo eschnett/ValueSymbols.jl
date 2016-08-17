@@ -41,12 +41,13 @@ print(io, vsyms[1])
 @test vsyms[2] != :car
 @test vsyms[3] != vsyms[2]
 
-@test syms[1] <= vsyms[1]
+@test vsyms[1] <= vsyms[1]
+@test vsyms[1] > vsyms[2]
+@test vsyms[1] < vsyms[3]
+
 @test vsyms[1] <= syms[1]
-sort!(vsyms)
-@test vsyms[1] < vsyms[2]
-@test vsyms[2] < vsyms[3]
-@test vsyms[1] < vsyms[3]       # transitivity
+@test vsyms[1] > syms[2]
+@test vsyms[1] <vsyms[3]
 
 
 

@@ -26,9 +26,10 @@ Base.show(io::IO, vsym::ValueSymbol) = show(io, convert(Symbol, vsym))
 Base. ==(vsym1::ValueSymbol, vsym2::ValueSymbol) = vsym1.ptr == vsym2.ptr
 Base. ==(vsym1::ValueSymbol, sym2::Symbol) = vsym1 == ValueSymbol(sym2)
 Base. ==(sym1::Symbol, vsym2::ValueSymbol) = ValueSymbol(sym1) == vsym2.ptr
-# Ordering is also based on pointer comparison
-# Note: This differs from the ordering of symbols, which depends on their value
-Base.isless(vsym1::ValueSymbol, vsym2::ValueSymbol) = vsym1.ptr < vsym2.ptr
+function Base.isless(vsym1::ValueSymbol, vsym2::ValueSymbol)
+    unsafe_wrap(String, Ptr{Cchar}(vsym1.ptr)) <
+        unsafe_wrap(String, Ptr{Cchar}(vsym2.ptr))
+end
 Base.isless(vsym1::ValueSymbol, sym2::Symbol) = vsym1 < ValueSymbol(sym2)
 Base.isless(sym1::Symbol, vsym2::ValueSymbol) = ValueSymbol(sym1) < vsym2
 
