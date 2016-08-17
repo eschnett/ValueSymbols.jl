@@ -32,28 +32,17 @@ Base.isless(vsym1::ValueSymbol, vsym2::ValueSymbol) = vsym1.ptr < vsym2.ptr
 Base.isless(vsym1::ValueSymbol, sym2::Symbol) = vsym1 < ValueSymbol(sym2)
 Base.isless(sym1::Symbol, vsym2::ValueSymbol) = ValueSymbol(sym1) < vsym2
 
-if VERSION < v"0.5-"
+typealias SerType begin
+    VERSION < v"0.5-" ? SerializationState : AbstractSerializer
+end
 
-function Base.serialize(ser::SerializationState, vsym::ValueSymbol)
+function Base.serialize(ser::SerType, vsym::ValueSymbol)
     Base.serialize_type(ser, ValueSymbol)
     write(ser.io, Symbol(vsym))
 end
 
-function Base.deserialize(ser::SerializationState, ::Type{ValueSymbol})
+function Base.deserialize(ser::SerType, ::Type{ValueSymbol})
     ValueSymbol(read(ser.io, Symbol))
-end
-
-else
-
-function Base.serialize(ser::AbstractSerializer, vsym::ValueSymbol)
-    Base.serialize_type(ser, ValueSymbol)
-    write(ser.io, Symbol(vsym))
-end
-
-function Base.deserialize(ser::AbstractSerializer, ::Type{ValueSymbol})
-    ValueSymbol(read(ser.io, Symbol))
-end
-
 end
 
 end

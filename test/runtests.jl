@@ -47,3 +47,12 @@ sort!(vsyms)
 @test vsyms[1] < vsyms[2]
 @test vsyms[2] < vsyms[3]
 @test vsyms[1] < vsyms[3]       # transitivity
+
+
+
+io = IOBuffer()
+serialize(io, vsyms)
+vsyms2 = deserialize(IOBuffer(takebuf_array(io)))
+for n in 1:length(vsyms2)
+    @test vsyms2[n] === vsyms[n]
+end
