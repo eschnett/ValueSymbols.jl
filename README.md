@@ -12,6 +12,27 @@ tuples with other bitstype types. Regular `Symbol` objects are stored
 as pointers, hence are not bitstypes, and hence currently require heap
 allocation.
 
+```Julia
+using ValueSymbols
+sym = :car
+isbits(sym)
+vsym = ValueSymbol(sym)
+isbits(vsym)
+```
+`ValueSymbol` is a bitstype, while `Symbol` is not.
+
+This is the practical consequence:
+```Julia
+@time Pair{Symbol,Int}[:car => i for i in 1:1000000];
+  0.082046 seconds (1.00 M allocations: 38.147 MB, 79.57% gc time)
+
+@time Pair{ValueSymbol,Int}[ValueSymbol(:car) => i for i in 1:1000000];
+  0.006780 seconds (2 allocations: 15.259 MB)
+```
+Creating tuples or pairs containing symbols requires one heap
+allocation per tuple or pair. If you use a `ValueSymbol` instead,
+these allocations are avoided.
+
 ## Examples
 
 Convert between symbols and value symbols:
