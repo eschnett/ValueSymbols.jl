@@ -34,7 +34,7 @@ Base.isless(vsym1::ValueSymbol, sym2::Symbol) = vsym1 < ValueSymbol(sym2)
 Base.isless(sym1::Symbol, vsym2::ValueSymbol) = ValueSymbol(sym1) < vsym2
 
 typealias SerType begin
-    VERSION < v"0.5-" ? SerializationState : AbstractSerializer
+    VERSION < v"0.5.0-dev+4755" ? SerializationState : AbstractSerializer
 end
 
 function Base.serialize(ser::SerType, vsym::ValueSymbol)
