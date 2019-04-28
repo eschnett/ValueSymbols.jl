@@ -1,0 +1,7 @@
+name = "ValueSymbols"
+uuid = "1becfd5a-13be-5cc0-ae8a-5353609a805d"
+version = "1.1.0"
+
+[deps]
+Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
