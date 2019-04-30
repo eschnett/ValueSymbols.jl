@@ -13,6 +13,7 @@ Base.convert(::Type{String}, vsym ::ValueSymbol) =
     String(convert(Symbol,vsym))
 
 Base.promote_rule(::Type{ValueSymbol}, ::Type{Symbol}) = ValueSymbol
+Base.promote_rule(::Type{Symbol}, ::Type{ValueSymbol}) = ValueSymbol
 
 # Output
 Base.show(io::IO, vsym::ValueSymbol) = show(io, convert(Symbol, vsym))
