@@ -1,49 +1,42 @@
 module ValueSymbols
 
-using Compat
-import Compat: String
+using Serialization
 
-export ValueSymbol
-immutable ValueSymbol
+struct ValueSymbol
     ptr::UInt
-    ValueSymbol(sym::Symbol) = new(Ptr{Cchar}(Cstring(sym)))
+    ValueSymbol(sym::Symbol) = new(pointer_from_objref(sym))
 end
 
-function Base.convert(::Type{Symbol}, vsym::ValueSymbol)
-    Symbol(unsafe_wrap(String, Ptr{Cchar}(vsym.ptr)))
-end
+Base.convert(::Type{Symbol}, vsym::ValueSymbol) =
+    unsafe_pointer_to_objref(reinterpret(Ptr{Nothing}, vsym.ptr))
+Base.convert(::Type{String}, vsym ::ValueSymbol) =
+    String(convert(Symbol,vsym))
 
 Base.promote_rule(::Type{ValueSymbol}, ::Type{Symbol}) = ValueSymbol
 
-
-
 # Output
 Base.show(io::IO, vsym::ValueSymbol) = show(io, convert(Symbol, vsym))
-
-
 
 # Equality is based on pointer comparison
 Base. ==(vsym1::ValueSymbol, vsym2::ValueSymbol) = vsym1.ptr == vsym2.ptr
 Base. ==(vsym1::ValueSymbol, sym2::Symbol) = vsym1 == ValueSymbol(sym2)
 Base. ==(sym1::Symbol, vsym2::ValueSymbol) = ValueSymbol(sym1) == vsym2.ptr
-function Base.isless(vsym1::ValueSymbol, vsym2::ValueSymbol)
-    unsafe_wrap(String, Ptr{Cchar}(vsym1.ptr)) <
-        unsafe_wrap(String, Ptr{Cchar}(vsym2.ptr))
-end
+
+Base.isless(vsym1::ValueSymbol, vsym2::ValueSymbol) =
+    isless(convert(String, vsym1), convert(String, vsym2))
+
 Base.isless(vsym1::ValueSymbol, sym2::Symbol) = vsym1 < ValueSymbol(sym2)
 Base.isless(sym1::Symbol, vsym2::ValueSymbol) = ValueSymbol(sym1) < vsym2
 
-typealias SerType begin
-    VERSION < v"0.5.0-dev+4755" ? SerializationState : AbstractSerializer
-end
 
-function Base.serialize(ser::SerType, vsym::ValueSymbol)
-    Base.serialize_type(ser, ValueSymbol)
+function Serialization.serialize(ser::AbstractSerializer, vsym::ValueSymbol)
+    Serialization.serialize_type(ser, ValueSymbol)
     write(ser.io, Symbol(vsym))
 end
 
-function Base.deserialize(ser::SerType, ::Type{ValueSymbol})
+function Serialization.deserialize(ser::AbstractSerializer, ::Type{ValueSymbol})
     ValueSymbol(read(ser.io, Symbol))
 end
 
+export ValueSymbol
 end
