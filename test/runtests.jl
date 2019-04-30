@@ -32,6 +32,8 @@ vsyms = map(ValueSymbol, syms)
         @test vsyms[1] == ValueSymbol(:car)
         @test vsyms[2] != ValueSymbol(:car)
         @test vsyms[3] != vsyms[2]
+        @test syms[1] != vsyms[1].ptr
+        @test syms[2] != vsyms[1].ptr
 
         # ValueSymbol and Symbol are different types, so comparing them via
         # `===` is always false
@@ -49,7 +51,13 @@ vsyms = map(ValueSymbol, syms)
 
         @test vsyms[1] <= syms[1]
         @test vsyms[1] > syms[2]
-        @test vsyms[1] <vsyms[3]
+        @test vsyms[1] < vsyms[3]
+
+        @test vsyms[1] < syms[3]
+        @test vsyms[2] < syms[3]
+        @test vsyms[1] <= syms[1]
+        @test vsyms[2] <= syms[3]
+
     end
 
     @testset "Buffer" begin
@@ -60,6 +68,23 @@ vsyms = map(ValueSymbol, syms)
         for n in 1:length(vsyms2)
             @test vsyms2[n] === vsyms[n]
         end
+    end
+
+    @testset "Promotion" begin
+        for i in syms, j in vsyms
+            @test promote_rule(typeof(i), typeof(j)) == promote_rule(typeof(j), typeof(i)) == ValueSymbol
+        end
+    end
+
+    @testset "Serialization" begin
+
+        ser1 = Serializer(stdin)
+        @test_broken 1 == 2
+
+        ser2 = Serializer(stdout)
+        @test 4 == Serialization.serialize(ser2, vsyms[1]) # outputs :car4
+        @test 5 == Serialization.serialize(ser2, vsyms[2]) # outputs :boat4
+        @test 6 == Serialization.serialize(ser2, vsyms[3]) # output :plane4
     end
 
 end
